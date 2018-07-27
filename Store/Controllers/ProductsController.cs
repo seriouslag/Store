@@ -91,7 +91,9 @@ namespace Store.Controllers
                 return BadRequest();
             }
 
-            _db.Entry(new Product(product.Name, product.ProductOptions.Select(po => new ProductOption(po.Name, po.Price, po.QuantityInStock, po.ProductOptionDescription)).ToList())).State = EntityState.Modified;
+            var item = _db.Products.Where(p => p.Id == id);
+
+            _db.Entry(item).State = EntityState.Modified;
 
             try
             {

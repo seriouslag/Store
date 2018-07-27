@@ -7,7 +7,7 @@ namespace Store.Models.Dto
 {
     public class OrderDto
     {
-        private ICollection<OrderItemDto> OrderItems { get; set; }
-
+        public int Id { get; set; }
+        public ICollection<OrderItemDto> OrderItems { get; set; }
     }
 }

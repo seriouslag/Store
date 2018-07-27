@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Ajax.Utilities;
 
@@ -6,7 +7,7 @@ namespace Store.Models
 {
     public class Order : BaseObject
     {
-        public ICollection<OrderItem> OrderItems { get; }
+        public ICollection<OrderItem> OrderItems { get; set; }
 
         public Order(OrderItem orderItem)
         {
