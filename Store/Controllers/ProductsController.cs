@@ -93,21 +93,24 @@ namespace Store.Controllers
 
             var item = _db.Products.Where(p => p.Id == id);
 
-            _db.Entry(item).State = EntityState.Modified;
+            if (item != null)
+            {
+                _db.Entry(item).State = EntityState.Modified;
 
-            try
-            {
-                await _db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
+                try
                 {
-                    return NotFound();
+                    await _db.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!ProductExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
 
@@ -122,7 +125,10 @@ namespace Store.Controllers
                 return BadRequest(ModelState);
             }
 
-            _db.Products.Add(new Product(product.Name, product.ProductOptions.Select(po => new ProductOption(po.Name, po.Price, po.QuantityInStock, po.ProductOptionDescription)).ToList()));
+            _db.Products.Add(
+                new Product(product.Name, product.ProductOptions.Select(po => 
+                    new ProductOption(po.Name, po.Price, po.QuantityInStock, po.ProductOptionDescription)
+                ).ToList()));
             await _db.SaveChangesAsync();
 
             return Ok();

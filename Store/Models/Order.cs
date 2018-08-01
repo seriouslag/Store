@@ -39,6 +39,12 @@ namespace Store.Models
             UpdateModifiedDate();
         }
 
+        public void AddOrderItem(OrderItem orderItem)
+        {
+            var orderItems = OrderItems.Where(o => o.Id == orderItem.Id);
+            UpdateOrder(orderItem);
+        }
+
         public void UpdateOrderItem(OrderItem orderItem)
         {
             if (!IsOrderItemInOrder(orderItem)) return;

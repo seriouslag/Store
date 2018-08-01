@@ -5,9 +5,7 @@ namespace Store.Models
 {
     public class OrderItem : BaseObject
     {
-        public ProductOption ProductOption { get; }
         public int Quantity { get; private set; }
-        public bool IsValid => IsValidOrderItemQuanity(Quantity);
 
         public OrderItem(ProductOption productOption, int quantity)
         {
@@ -21,5 +19,22 @@ namespace Store.Models
         public void UpdateQuanity(int quantity) => Quantity = IsValidOrderItemQuanity(quantity) ? quantity : throw new OrderItemQuanityLessThanZeroException();
 
         public bool IsValidOrderItemQuanity(int quantity) => quantity > 0;
+
+        public bool IsValid()
+        {
+            if(IsValidOrderItemQuanity(Quantity))
+            {
+                return false;
+            }
+
+            if (ProductOption.QuantityInStock <= 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public ProductOption ProductOption { get; set; }
     }
 }

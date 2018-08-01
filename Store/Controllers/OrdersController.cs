@@ -64,9 +64,45 @@ namespace Store.Controllers
                 return BadRequest();
             }
 
-            var item = _db.Orders.Where(o => o.Id == id);
+            var item = _db.Orders.First(o => o.Id == id);
 
-            _db.Entry(item).State = EntityState.Modified;
+            if (item != null)
+            {
+                item.UpdateOrderItems(
+                    order.OrderItems.Select(oi => new OrderItem(GetProductOptionById(oi.ProductOptionId), oi.Quantity)).ToList());
+
+                _db.Entry(item).State = EntityState.Modified;
+
+                try
+                {
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!OrderExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        public async Task<IHttpActionResult> AddOrderItemToOrder(int orderId, OrderItemDto orderItem)
+        {
+            var order = _db.Orders.First(o => o.Id == orderId);
+            
+            if(order == null)
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+
+            order.UpdateOrderItem(new OrderItem(GetProductOptionById(orderItem.ProductOptionId), orderItem.Quantity));
 
             try
             {
@@ -74,9 +110,9 @@ namespace Store.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!OrderExists(id))
+                if (!OrderExists(orderId))
                 {
-                    return NotFound();
+                    return StatusCode(HttpStatusCode.NoContent);
                 }
                 else
                 {
@@ -85,6 +121,7 @@ namespace Store.Controllers
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+
         }
 
         // POST: api/Orders
